@@ -36,7 +36,14 @@ void random_fill_matrix(const Matrix<unsigned> &matrix, const size_t dimension,
 }
 
 int main() {
-  constexpr size_t dimension = 1000;
+  constexpr size_t dimension = 10;
+  constexpr size_t number_limit = 10000;
+
+  const Matrix<unsigned> matrix(dimension);
+
+  random_fill_matrix(matrix, dimension, number_limit);
+
+  matrix.print();
 
   return 0;
 }
