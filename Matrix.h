@@ -12,7 +12,7 @@ class Matrix {
   Element *const m_Data;
 
 public:
-  Matrix(const size_t dimension, const size_t element_size) :
+  explicit Matrix(const size_t dimension) :
     m_Dimension(dimension),
     m_Data(static_cast<Element *>(safe_alloc(dimension * dimension,
                                              sizeof(Element)))) {
