@@ -3,6 +3,6 @@
 
 class FloydWarshallPathFinder final : public PathFinder {
 public:
-  void find_paths(const TMatrix &transition_matrix,
-                  const TMatrix &paths) const override;
+  void find_paths(const DistanceMatrix &transition_matrix,
+                  const DistanceMatrix &paths) const override;
 };
