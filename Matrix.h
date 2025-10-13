@@ -3,12 +3,13 @@
 #include <cstddef>
 #include <cstring>
 #include <cstdio>
+#include <cmath>
 
 #include <iostream>
 
 #include "Support.h"
 
-template <typename element_t>
+template <typename element_t, long double precision_multiplier>
 class Matrix {
   element_t *const m_Data;
 
@@ -21,19 +22,28 @@ public:
                                                sizeof(element_t), zero))) {
   }
 
-  Matrix(const Matrix<element_t> &that) : m_Data(
-                                              static_cast<element_t *>(
-                                                safe_alloc(
-                                                    that.dimension * that.
-                                                    dimension,
-                                                    sizeof(element_t)))),
-                                          dimension(that.dimension) {
+  Matrix(const Matrix<element_t, precision_multiplier> &that) : m_Data(
+        static_cast<element_t *>(
+          safe_alloc(
+              that.dimension * that.
+              dimension,
+              sizeof(element_t)))),
+    dimension(that.dimension) {
     memcpy(m_Data, that.m_Data,
            that.dimension * that.dimension * sizeof(element_t));
   }
 
   ~Matrix() {
     safe_free(m_Data);
+  }
+
+  bool operator==(const Matrix<element_t, precision_multiplier> &that) const {
+    for (size_t i = 0; i < dimension * dimension; i++) {
+      if (std::fabs(m_Data[i] - that.m_Data[i]) > precision_multiplier *
+          std::max(m_Data[i], that.m_Data[i]))
+        return false;
+    }
+    return true;
   }
 
   element_t *operator[](const size_t row) const {

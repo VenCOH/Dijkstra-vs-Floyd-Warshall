@@ -65,5 +65,7 @@ int main() {
                    paths_d);
   paths_d.print();
 
+  std::cout << (paths_fw == paths_d) << std::endl;
+
   return 0;
 }
