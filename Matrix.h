@@ -2,23 +2,32 @@
 
 #include <cstddef>
 #include <cstring>
-
 #include <cstdio>
-
-#include "Support.h"
 
 #include <iostream>
 
+#include "Support.h"
+
 template <typename Element>
 class Matrix {
-  const size_t m_Dimension;
   Element *const m_Data;
 
 public:
-  explicit Matrix(const size_t dimension) :
-    m_Dimension(dimension),
+  const size_t dimension;
+
+  explicit Matrix(const size_t dimension, const bool zero = false) :
+    dimension(dimension),
     m_Data(static_cast<Element *>(safe_alloc(dimension * dimension,
-                                             sizeof(Element)))) {
+                                             sizeof(Element), zero))) {
+  }
+
+  Matrix(const Matrix<Element> &that) : m_Data(
+                                            static_cast<Element *>(safe_alloc(
+                                                that.dimension * that.dimension,
+                                                sizeof(Element)))),
+                                        dimension(that.dimension) {
+    memcpy(m_Data, that.m_Data,
+           that.dimension * that.dimension * sizeof(Element));
   }
 
   ~Matrix() {
@@ -26,18 +35,20 @@ public:
   }
 
   Element *operator[](const size_t row) const {
-    return m_Data + m_Dimension * row;
+    return m_Data + dimension * row;
   }
 
-  void zero_fill() const {
-    std::memset(m_Data, 0, m_Dimension * m_Dimension * sizeof(Element));
+  void fill(const int byte) const {
+    std::memset(m_Data, byte, dimension * dimension * sizeof(Element));
   }
 
   void print() const {
-    for (size_t row = 0; row < m_Dimension; row++) {
-      for (size_t col = 0; col < m_Dimension; col++)
-        if (col != m_Dimension - 1)
-          std::cout << (*this)[row][col] << ' ';
+    for (size_t row = 0; row < dimension; row++) {
+      for (size_t col = 0; col < dimension; col++) {
+        std::cout << (*this)[row][col];
+        if (col != dimension - 1)
+          std::cout << ' ';
+      }
       std::cout << '\n';
     }
     std::cout << std::flush;

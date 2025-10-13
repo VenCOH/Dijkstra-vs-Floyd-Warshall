@@ -9,10 +9,12 @@
 
 #include "Support.h"
 #include "PathFinder.h"
+#include "FloydWarshallPathFinder.h"
 
 
-void run_solver_timed(const std::string &finder_name, PathFinder &path_finder,
-                      const TransitionMatrix &transition_matrix, Paths &paths) {
+void run_solver_timed(const std::string &finder_name,
+                      const PathFinder &path_finder,
+                      const TMatrix &transition_matrix, const TMatrix &paths) {
   std::cout << "Running path finder " << finder_name << std::endl;
 
   const std::chrono::steady_clock::time_point start_time =
@@ -31,19 +33,30 @@ void random_fill_matrix(const Matrix<unsigned> &matrix, const size_t dimension,
   std::random_device random_generator;
 
   for (size_t row = 0; row < dimension; row++)
-    for (size_t col = 0; col < dimension; col++)
+    for (size_t col = row + 1; col < dimension; col++) {
       matrix[row][col] = random_generator() % number_limit;
+      if (matrix[row][col] == 0)
+        matrix[row][col] = T_INFINITY;
+      matrix[col][row] = matrix[row][col];
+    }
 }
 
 int main() {
   constexpr size_t dimension = 10;
-  constexpr size_t number_limit = 10000;
+  constexpr size_t number_limit = 10;
 
-  const Matrix<unsigned> matrix(dimension);
+  const Matrix<unsigned> matrix(dimension, true);
 
   random_fill_matrix(matrix, dimension, number_limit);
 
   matrix.print();
+
+  const Matrix<unsigned> paths(dimension);
+
+  run_solver_timed("Floyd-Warshall finder", FloydWarshallPathFinder(), matrix,
+                   paths);
+
+  paths.print();
 
   return 0;
 }
