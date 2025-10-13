@@ -8,38 +8,40 @@
 
 #include "Support.h"
 
-template <typename Element>
+template <typename element_t>
 class Matrix {
-  Element *const m_Data;
+  element_t *const m_Data;
 
 public:
   const size_t dimension;
 
   explicit Matrix(const size_t dimension, const bool zero = false) :
     dimension(dimension),
-    m_Data(static_cast<Element *>(safe_alloc(dimension * dimension,
-                                             sizeof(Element), zero))) {
+    m_Data(static_cast<element_t *>(safe_alloc(dimension * dimension,
+                                               sizeof(element_t), zero))) {
   }
 
-  Matrix(const Matrix<Element> &that) : m_Data(
-                                            static_cast<Element *>(safe_alloc(
-                                                that.dimension * that.dimension,
-                                                sizeof(Element)))),
-                                        dimension(that.dimension) {
+  Matrix(const Matrix<element_t> &that) : m_Data(
+                                              static_cast<element_t *>(
+                                                safe_alloc(
+                                                    that.dimension * that.
+                                                    dimension,
+                                                    sizeof(element_t)))),
+                                          dimension(that.dimension) {
     memcpy(m_Data, that.m_Data,
-           that.dimension * that.dimension * sizeof(Element));
+           that.dimension * that.dimension * sizeof(element_t));
   }
 
   ~Matrix() {
     safe_free(m_Data);
   }
 
-  Element *operator[](const size_t row) const {
+  element_t *operator[](const size_t row) const {
     return m_Data + dimension * row;
   }
 
   void fill(const int byte) const {
-    std::memset(m_Data, byte, dimension * dimension * sizeof(Element));
+    std::memset(m_Data, byte, dimension * dimension * sizeof(element_t));
   }
 
   void print() const {

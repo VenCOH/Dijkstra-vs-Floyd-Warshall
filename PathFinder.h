@@ -1,15 +1,21 @@
 #pragma once
 
+#include <limits>
+
 #include "Matrix.h"
 
-typedef Matrix<uint32_t> TMatrix;
+typedef uint32_t node_t;
+typedef float distance_t;
 
-constexpr uint32_t T_INFINITY = UINT32_MAX;
+typedef Matrix<distance_t> DistanceMatrix;
+
+constexpr distance_t DISTANCE_INFINITY = std::numeric_limits<
+  distance_t>::infinity();
 
 class PathFinder {
 public:
   PathFinder() = default;
-  virtual void find_paths(const TMatrix &transition_matrix,
-                          const TMatrix &paths) const = 0;
+  virtual void find_paths(const DistanceMatrix &transition_matrix,
+                          const DistanceMatrix &paths) const = 0;
   virtual ~PathFinder() = default;
 };

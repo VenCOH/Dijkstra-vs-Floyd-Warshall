@@ -14,7 +14,8 @@
 
 void run_solver_timed(const std::string &finder_name,
                       const PathFinder &path_finder,
-                      const TMatrix &transition_matrix, const TMatrix &paths) {
+                      const DistanceMatrix &transition_matrix,
+                      const DistanceMatrix &paths) {
   std::cout << "Running path finder " << finder_name << std::endl;
 
   const std::chrono::steady_clock::time_point start_time =
@@ -28,15 +29,17 @@ void run_solver_timed(const std::string &finder_name,
       std::endl;
 }
 
-void random_fill_matrix(const Matrix<unsigned> &matrix, const size_t dimension,
-                        const unsigned number_limit) {
+void random_fill_matrix(const DistanceMatrix &matrix, const node_t dimension,
+                        const distance_t number_limit) {
   std::random_device random_generator;
 
   for (size_t row = 0; row < dimension; row++)
     for (size_t col = row + 1; col < dimension; col++) {
-      matrix[row][col] = random_generator() % number_limit;
+      matrix[row][col] = static_cast<distance_t>(
+        random_generator() % static_cast<std::random_device::result_type>(
+          number_limit));
       if (matrix[row][col] == 0)
-        matrix[row][col] = T_INFINITY;
+        matrix[row][col] = DISTANCE_INFINITY;
       matrix[col][row] = matrix[row][col];
     }
 }
@@ -45,13 +48,13 @@ int main() {
   constexpr size_t dimension = 10;
   constexpr size_t number_limit = 10;
 
-  const Matrix<unsigned> matrix(dimension, true);
+  const DistanceMatrix matrix(dimension, true);
 
   random_fill_matrix(matrix, dimension, number_limit);
 
   matrix.print();
 
-  const Matrix<unsigned> paths(dimension);
+  const DistanceMatrix paths(dimension);
 
   run_solver_timed("Floyd-Warshall finder", FloydWarshallPathFinder(), matrix,
                    paths);
