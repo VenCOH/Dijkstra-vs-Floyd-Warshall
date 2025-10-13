@@ -1,3 +1,4 @@
+#include "DijkstraPathFinder.h"
 #include "Matrix.h"
 
 #include <cstdio>
@@ -10,7 +11,7 @@
 #include "Support.h"
 #include "PathFinder.h"
 #include "FloydWarshallPathFinder.h"
-
+#include "DijkstraPathFinder.h"
 
 void run_solver_timed(const std::string &finder_name,
                       const PathFinder &path_finder,
@@ -45,21 +46,24 @@ void random_fill_matrix(const DistanceMatrix &matrix, const node_t dimension,
 }
 
 int main() {
-  constexpr size_t dimension = 10;
+  constexpr size_t node_count = 10;
   constexpr size_t number_limit = 10;
 
-  const DistanceMatrix matrix(dimension, true);
+  const DistanceMatrix matrix(node_count, true);
 
-  random_fill_matrix(matrix, dimension, number_limit);
+  random_fill_matrix(matrix, node_count, number_limit);
 
   matrix.print();
 
-  const DistanceMatrix paths(dimension);
+  const DistanceMatrix paths_fw(node_count);
+  run_solver_timed("Floyd-Warshall", FloydWarshallPathFinder(), matrix,
+                   paths_fw);
+  paths_fw.print();
 
-  run_solver_timed("Floyd-Warshall finder", FloydWarshallPathFinder(), matrix,
-                   paths);
-
-  paths.print();
+  const DistanceMatrix paths_d(node_count);
+  run_solver_timed("Dijkstra", DijkstraPathFinder(), matrix,
+                   paths_d);
+  paths_d.print();
 
   return 0;
 }
