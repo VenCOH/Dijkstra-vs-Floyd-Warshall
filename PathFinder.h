@@ -7,7 +7,7 @@
 typedef uint32_t node_t;
 typedef float distance_t;
 
-typedef Matrix<distance_t, 1.0e-12L> DistanceMatrix;
+typedef Matrix<distance_t, 1.0e-5L> DistanceMatrix;
 
 constexpr distance_t DISTANCE_INFINITY = std::numeric_limits<
   distance_t>::infinity();
