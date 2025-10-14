@@ -13,6 +13,7 @@
 #include "FloydWarshallPathFinder.h"
 #include "DijkstraPathFinder.h"
 #include "DijkstraThreadedPathFinder.h"
+#include "FloydWarshallCudaFinder.cuh"
 
 void run_solver_timed(const std::string &finder_name,
                       const PathFinder &path_finder,
@@ -48,7 +49,7 @@ void random_fill_matrix(const DistanceMatrix &matrix, const node_t dimension,
 }
 
 int main() {
-  constexpr size_t node_count = 500;
+  constexpr size_t node_count = 100;
   constexpr size_t number_limit = 1000;
 
   const DistanceMatrix matrix(node_count, true);
@@ -69,7 +70,6 @@ int main() {
                    paths_d);
   if (node_count <= 20)
     paths_d.print();
-
   std::cout << "Is same as Floyd-Warshall? " << (paths_fw == paths_d) <<
       std::endl;
 
@@ -78,18 +78,26 @@ int main() {
                    paths_dt);
   if (node_count <= 20)
     paths_dt.print();
-
   std::cout << "Is same as Floyd-Warshall? " << (paths_fw == paths_dt) <<
       std::endl;
 
   const DistanceMatrix paths_dts(node_count);
-  run_solver_timed("Dijkstra threaded smart", DijkstraThreadedPathFinder(),
+  run_solver_timed("Dijkstra threaded smart",
+                   DijkstraThreadedPathFinderSmart(20),
                    matrix,
                    paths_dts);
   if (node_count <= 20)
     paths_dts.print();
-
   std::cout << "Is same as Floyd-Warshall? " << (paths_fw == paths_dts) <<
+      std::endl;
+
+  const DistanceMatrix paths_fwc(node_count);
+  run_solver_timed("Floyd-Warshall CUDA", FloydWarshallCudaFinder(),
+                   matrix,
+                   paths_fwc);
+  if (node_count <= 20)
+    paths_fwc.print();
+  std::cout << "Is same as Floyd-Warshall? " << (paths_fw == paths_fwc) <<
       std::endl;
 
   return 0;
