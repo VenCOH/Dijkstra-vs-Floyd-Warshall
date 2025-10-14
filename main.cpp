@@ -48,7 +48,7 @@ void random_fill_matrix(const DistanceMatrix &matrix, const node_t dimension,
 }
 
 int main() {
-  constexpr size_t node_count = 1000;
+  constexpr size_t node_count = 500;
   constexpr size_t number_limit = 1000;
 
   const DistanceMatrix matrix(node_count, true);
@@ -70,7 +70,8 @@ int main() {
   if (node_count <= 20)
     paths_d.print();
 
-  std::cout << (paths_fw == paths_d) << std::endl;
+  std::cout << "Is same as Floyd-Warshall? " << (paths_fw == paths_d) <<
+      std::endl;
 
   const DistanceMatrix paths_dt(node_count);
   run_solver_timed("Dijkstra threaded", DijkstraThreadedPathFinder(), matrix,
@@ -78,7 +79,18 @@ int main() {
   if (node_count <= 20)
     paths_dt.print();
 
-  std::cout << (paths_fw == paths_dt) << std::endl;
+  std::cout << "Is same as Floyd-Warshall? " << (paths_fw == paths_dt) <<
+      std::endl;
+
+  const DistanceMatrix paths_dts(node_count);
+  run_solver_timed("Dijkstra threaded smart", DijkstraThreadedPathFinder(),
+                   matrix,
+                   paths_dts);
+  if (node_count <= 20)
+    paths_dts.print();
+
+  std::cout << "Is same as Floyd-Warshall? " << (paths_fw == paths_dts) <<
+      std::endl;
 
   return 0;
 }
