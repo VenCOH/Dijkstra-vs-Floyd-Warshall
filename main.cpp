@@ -28,7 +28,7 @@ void run_solver_timed(const std::string &finder_name,
       std::chrono::steady_clock::now();
 
   std::cout << "Execution time: " << std::chrono::duration_cast<
-        std::chrono::microseconds>(end_time - start_time).count() << "[µs]" <<
+        std::chrono::milliseconds>(end_time - start_time).count() << "[ms]" <<
       std::endl;
 }
 
