@@ -25,8 +25,7 @@ __global__ void simple_kernel(
 }
 
 void FloydWarshallCudaFinder::find_paths(
-    const DistanceMatrix &transition_matrix,
-    const DistanceMatrix &paths) const {
+    const DistanceMatrix &transition_matrix, DistanceMatrix &paths) const {
   const size_t number_of_nodes = transition_matrix.dimension;
   const size_t number_of_blocks =
       (number_of_nodes * number_of_nodes - 1) / THREADS_PER_BLOCK + 1;

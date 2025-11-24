@@ -36,7 +36,7 @@ void DijkstraPathFinder::find_path_to_others(
 }
 
 void DijkstraPathFinder::find_paths(const DistanceMatrix &node_distances,
-                                    const DistanceMatrix &minimal_paths) const {
+                                    DistanceMatrix &minimal_paths) const {
   const node_t node_count = node_distances.dimension;
 
   for (node_t node = 0; node < node_count; node++)

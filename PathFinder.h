@@ -17,6 +17,6 @@ class PathFinder {
 public:
   PathFinder() = default;
   virtual void find_paths(const DistanceMatrix &transition_matrix,
-                          const DistanceMatrix &paths) const = 0;
+                          DistanceMatrix &paths) const = 0;
   virtual ~PathFinder() = default;
 };

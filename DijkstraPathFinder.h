@@ -10,5 +10,5 @@ protected:
 
 public:
   void find_paths(const DistanceMatrix &node_distances,
-                  const DistanceMatrix &minimal_paths) const override;
+                  DistanceMatrix &minimal_paths) const override;
 };
