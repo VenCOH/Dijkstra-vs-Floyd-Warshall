@@ -1,5 +1,5 @@
 #include "../include/Matrix.h"
-#include "DijkstraPathFinder.h"
+#include "../include/DijkstraPathFinder.h"
 
 #include <cstdint>
 #include <cstdio>
@@ -10,7 +10,7 @@
 
 #include "../include/FloydWarshallPathFinder.h"
 #include "../include/Support.h"
-#include "PathFinder.h"
+#include "../include/PathFinder.h"
 // #include "DijkstraPathFinder.h"
 // #include "DijkstraThreadedPathFinder.h"
 // #include "FloydWarshallCudaFinder.cuh"

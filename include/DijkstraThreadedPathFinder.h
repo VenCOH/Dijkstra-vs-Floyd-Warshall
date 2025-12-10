@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../DijkstraPathFinder.h"
+#include "../include/DijkstraPathFinder.h"
 
 class DijkstraThreadedPathFinder final : public DijkstraPathFinder {
 public:
