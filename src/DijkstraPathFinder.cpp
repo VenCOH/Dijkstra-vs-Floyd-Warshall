@@ -1,9 +1,9 @@
-#include "DijkstraPathFinder.h"
+#include "../include/DijkstraPathFinder.h"
 
 #include <algorithm>
-#include <utility>
 #include <deque>
 #include <queue>
+#include <utility>
 #include <vector>
 
 void DijkstraPathFinder::find_path_to_others(

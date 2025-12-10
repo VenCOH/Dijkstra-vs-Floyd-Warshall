@@ -1,4 +1,4 @@
-#include "FloydWarshallCudaFinder.cuh"
+#include "../include/FloydWarshallCudaFinder.cuh"
 
 #define THREADS_PER_BLOCK 256
 

@@ -1,4 +1,4 @@
-#include "DijkstraThreadedPathFinder.h"
+#include "../include/DijkstraThreadedPathFinder.h"
 
 #include <thread>
 #include <vector>

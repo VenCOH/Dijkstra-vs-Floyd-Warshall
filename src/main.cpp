@@ -1,16 +1,16 @@
+#include "../include/Matrix.h"
 #include "DijkstraPathFinder.h"
-#include "Matrix.h"
 
-#include <cstdio>
 #include <cstdint>
+#include <cstdio>
 
 #include <random>
 #include <chrono>
 #include <iostream>
 
-#include "Support.h"
+#include "../include/FloydWarshallPathFinder.h"
+#include "../include/Support.h"
 #include "PathFinder.h"
-#include "FloydWarshallPathFinder.h"
 // #include "DijkstraPathFinder.h"
 // #include "DijkstraThreadedPathFinder.h"
 // #include "FloydWarshallCudaFinder.cuh"

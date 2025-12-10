@@ -1,7 +1,7 @@
 #include <cstddef>
 
-#include "Support.h"
-#include "FloydWarshallPathFinder.h"
+#include "../include/FloydWarshallPathFinder.h"
+#include "../include/Support.h"
 #include <omp.h>
 
 void FloydWarshallPathFinder::find_paths(
