@@ -1,5 +1,7 @@
 #include "../include/DijkstraThreadedPathFinder.h"
 
+#include "omp.h"
+
 #include <thread>
 #include <vector>
 
@@ -45,4 +47,12 @@ void DijkstraThreadedPathFinderSmart::find_paths(
   }
   for (auto &thread : threads)
     thread.join();
+}
+void DijkstraPathFinderOMP::find_paths(const DistanceMatrix &node_distances,
+                                       DistanceMatrix &minimal_paths) const {
+  node_t node_count = node_distances.dimension;
+
+#pragma omp parallel for default(none) shared(node_distances, node_count, minimal_paths)
+  for (node_t node = 0; node < node_count; node++)
+    find_path_to_others(node_distances, minimal_paths[node], node);
 }

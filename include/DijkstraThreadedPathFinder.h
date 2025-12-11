@@ -16,11 +16,14 @@ class DijkstraThreadedPathFinderSmart final : public DijkstraPathFinder {
                                    node_t start_node, node_t end_node);
 
 public:
-  explicit DijkstraThreadedPathFinderSmart(const size_t thread_count) :
-    DijkstraPathFinder(),
-    m_Thread_count(thread_count) {
-  }
+  explicit DijkstraThreadedPathFinderSmart(const size_t thread_count)
+      : DijkstraPathFinder(), m_Thread_count(thread_count) {}
 
+  void find_paths(const DistanceMatrix &node_distances,
+                  DistanceMatrix &minimal_paths) const override;
+};
+
+class DijkstraPathFinderOMP final : public DijkstraPathFinder {
   void find_paths(const DistanceMatrix &node_distances,
                   DistanceMatrix &minimal_paths) const override;
 };
