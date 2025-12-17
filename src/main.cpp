@@ -1,19 +1,13 @@
-#include "../include/Matrix.h"
 #include "../include/DijkstraPathFinder.h"
-
-#include <cstdint>
-#include <cstdio>
+#include "../include/DijkstraThreadedPathFinder.h"
+#include "../include/Matrix.h"
 
 #include <random>
 #include <chrono>
 #include <iostream>
 
 #include "../include/FloydWarshallPathFinder.h"
-#include "../include/Support.h"
 #include "../include/PathFinder.h"
-// #include "DijkstraPathFinder.h"
-// #include "DijkstraThreadedPathFinder.h"
-// #include "FloydWarshallCudaFinder.cuh"
 
 void run_solver_timed(const std::string &finder_name,
                       const PathFinder &path_finder,
@@ -41,14 +35,14 @@ void random_fill_matrix(const DistanceMatrix &matrix, const node_t dimension,
   std::random_device random_source;
   std::mt19937 generator(random_source());
   static constexpr auto max_random_number =
-      static_cast<double>(std::numeric_limits<
-        std::mt19937::result_type>::max());
+      static_cast<double>(generator.max());
   for (size_t row = 0; row < dimension; row++)
     for (size_t col = 0; col < dimension; col++) {
       if (row == col)
         matrix[row][col] = 0;
       else {
-        if (generator() / max_random_number < edge_exists_chance)
+        double chance = generator() / max_random_number;
+        if (chance < edge_exists_chance)
           matrix[row][col] = static_cast<distance_t>(
                                generator() % static_cast<
                                  std::mt19937::result_type>(
@@ -67,67 +61,67 @@ void random_fill_matrix(const DistanceMatrix &matrix, const node_t dimension,
       std::endl;
 }
 
+#ifndef NODE_COUNT
+#define NODE_COUNT 10
+#endif
+
+#ifndef NUMBER_LIMIT
+#define NUMBER_LIMIT 4000
+#endif
+
+#ifndef EDGE_EXISTS_CHANCE
+#define EDGE_EXISTS_CHANCE 0.5
+#endif
+
 int main() {
-  constexpr size_t node_count = 4096;
-  constexpr size_t number_limit = 1000;
+  const DistanceMatrix matrix(NODE_COUNT, true);
 
-  const DistanceMatrix matrix(node_count, true);
+  random_fill_matrix(matrix, NODE_COUNT, NUMBER_LIMIT, EDGE_EXISTS_CHANCE);
 
-  random_fill_matrix(matrix, node_count, number_limit, 1);
-
-  if (node_count <= 20)
+  if (NODE_COUNT <= 20)
     matrix.print();
 
-  DistanceMatrix paths_fw(node_count);
-  // run_solver_timed("Floyd-Warshall", FloydWarshallPathFinder(), matrix,
-  //                  paths_fw);
-  // if (node_count <= 20)
-  //   paths_fw.print();
+  DistanceMatrix paths_fw(NODE_COUNT);
+#ifdef FW
+  run_solver_timed("Floyd-Warshall", FloydWarshallPathFinder(), matrix,
+                   paths_fw);
+  if (NODE_COUNT <= 20)
+    paths_fw.print();
+#endif
 
-  DistanceMatrix paths_fw_omp(node_count);
+  DistanceMatrix paths_fw_omp(NODE_COUNT);
   run_solver_timed("Blocked Floyd-Warshall", BlockedFloydWarshallPathFinder(), matrix,
                    paths_fw_omp);
-  if (node_count <= 20)
+  if (NODE_COUNT <= 20)
     paths_fw_omp.print();
   std::cout << "Is same as Floyd-Warshall? " << (paths_fw == paths_fw_omp) <<
       std::endl;
 
-  // DistanceMatrix paths_d(node_count);
-  // run_solver_timed("Dijkstra", DijkstraPathFinder(), matrix,
-  //                  paths_d);
-  // if (node_count <= 20)
-  //   paths_d.print();
-  // std::cout << "Is same as Floyd-Warshall? " << (paths_fw == paths_d) <<
-  //     std::endl;
-  //
-  // DistanceMatrix paths_dt(node_count);
-  // run_solver_timed("Dijkstra threaded", DijkstraThreadedPathFinder(), matrix,
-  //                  paths_dt);
-  // if (node_count <= 20)
-  //   paths_dt.print();
-  // std::cout << "Is same as Floyd-Warshall? " << (paths_fw == paths_dt) <<
-  //     std::endl;
-  //
-  // DistanceMatrix paths_dts(node_count);
-  // run_solver_timed("Dijkstra threaded smart",
-  //                  DijkstraThreadedPathFinderSmart(10),
-  //                  matrix,
-  //                  paths_dts);
-  // if (node_count <= 20)
-  //   paths_dts.print();
-  // std::cout << "Is same as Floyd-Warshall? " << (paths_fw == paths_dts) <<
-  //     std::endl;
+#ifdef DIJKSTRA
+  DistanceMatrix paths_d(NODE_COUNT);
+  run_solver_timed("Dijkstra", DijkstraPathFinder(), matrix,
+                   paths_d);
+  if (NODE_COUNT <= 20)
+    paths_d.print();
+  std::cout << "Is same as Floyd-Warshall? " << (paths_fw == paths_d) <<
+      std::endl;
+#endif
 
-  // const DistanceMatrix paths_fwc(node_count);
-  // run_solver_timed("Floyd-Warshall CUDA", FloydWarshallCudaFinder(),
-  //                  matrix,
-  //                  paths_fwc);
-  // if (node_count <= 20)
-  //   paths_fwc.print();
-  // std::cout << "Is same as Floyd-Warshall? " << (paths_fw == paths_fwc) <<
-  //     std::endl;
+  DistanceMatrix paths_dijkstra_omp(NODE_COUNT);
+  run_solver_timed("OMP Dijkstra", DijkstraPathFinderOMP(), matrix,
+                   paths_dijkstra_omp);
+  if (NODE_COUNT <= 20)
+    paths_dijkstra_omp.print();
+  std::cout << "Is same as Floyd-Warshall? " << (paths_fw == paths_dijkstra_omp) <<
+      std::endl;
 
-
+  DistanceMatrix paths_dijkstra_omp_small(NODE_COUNT);
+  run_solver_timed("OMP Dijkstra small", DijkstraPathFinderOMPSmall(), matrix,
+                   paths_dijkstra_omp_small);
+  if (NODE_COUNT <= 20)
+    paths_dijkstra_omp_small.print();
+  std::cout << "Is same as Floyd-Warshall? " << (paths_fw == paths_dijkstra_omp_small) <<
+      std::endl;
 
   return 0;
 }

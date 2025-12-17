@@ -33,7 +33,7 @@ void FloydWarshallPathFinder::find_paths(
   memcpy(paths[0], (*current)[0], dimension * dimension * sizeof(*paths[0]));
 }
 
-#define BLOCK_SIZE 16
+#define BLOCK_SIZE 256
 
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
 
@@ -49,51 +49,54 @@ void BlockedFloydWarshallPathFinder::find_paths(
   #pragma omp parallel default(shared)
   {
     #pragma omp single
-    for (size_t block = 0; block < node_count/BLOCK_SIZE; block++) {
-      const size_t begin = block*BLOCK_SIZE;
-      const size_t end = (block + 1) * BLOCK_SIZE;
+    {
+      const size_t block_end = node_count % BLOCK_SIZE ? node_count/BLOCK_SIZE + 1 : node_count/BLOCK_SIZE;
+      for (size_t block = 0; block < block_end; block++) {
+        const size_t begin = block*BLOCK_SIZE;
+        const size_t end = (block + 1) * BLOCK_SIZE > node_count ? node_count : (block + 1) * BLOCK_SIZE;
 
-      // independent blocks
-      // #pragma omp parallel for schedule(static, 16) collapse(3)
-      for (size_t k = begin; k < end; k++)
-        for (size_t i = begin; i < end; i++)
-          for (size_t j = begin; j < end; j++)
-            matrix[i][j] = MIN(matrix[i][j], matrix[i][k] + matrix[k][j]);
-
-      // i-aligned slightly dependent blocks
-      // #pragma omp parallel for schedule(guided)
-      for (size_t i_block = 0; i_block < node_count/BLOCK_SIZE; i_block++) {
-        const size_t i_begin = i_block * BLOCK_SIZE;
-        const size_t i_end = (i_block + 1) * BLOCK_SIZE;
+        // independent blocks
+#pragma omp parallel for schedule(static) collapse(3)
         for (size_t k = begin; k < end; k++)
           for (size_t i = begin; i < end; i++)
-            for (size_t j = i_begin; j < i_end; j++)
-              matrix[i][j] = MIN(matrix[i][j], matrix[i][k] + matrix[k][j]);
-      }
-
-      // j-aligned slightly dependent blocks
-      // #pragma omp parallel for schedule(guided)
-      for (size_t j_block = 0; j_block < node_count/BLOCK_SIZE; j_block++) {
-        const size_t j_begin = j_block * BLOCK_SIZE;
-        const size_t j_end = (j_block + 1) * BLOCK_SIZE;
-        for (size_t k = begin; k < end; k++)
-          for (size_t i = j_begin; i < j_end; i++)
             for (size_t j = begin; j < end; j++)
               matrix[i][j] = MIN(matrix[i][j], matrix[i][k] + matrix[k][j]);
-      }
 
-      // doubly dependent blocks
-      #pragma omp parallel for collapse(2) schedule(guided)
-      for (size_t i_block = 0; i_block < node_count/BLOCK_SIZE; i_block++) {
-        const size_t i_begin = i_block * BLOCK_SIZE;
-        const size_t i_end = (i_block + 1) * BLOCK_SIZE;
-        for (size_t j_block = 0; j_block < node_count/BLOCK_SIZE; j_block++) {
-          const size_t j_begin = j_block * BLOCK_SIZE;
-          const size_t j_end = (j_block + 1) * BLOCK_SIZE;
-          for (size_t i = j_begin; i < j_end; i++)
-            for (size_t j = i_begin; j < i_end; j++)
-              for (size_t k = begin; k < end; k++)
+        // i-aligned slightly dependent blocks
+#pragma omp parallel for schedule(static)
+        for (size_t i_block = 0; i_block < block_end; i_block++) {
+          const size_t i_begin = i_block * BLOCK_SIZE;
+          const size_t i_end = (i_block + 1) * BLOCK_SIZE > node_count ? node_count : (i_block + 1) * BLOCK_SIZE;
+          for (size_t k = begin; k < end; k++)
+            for (size_t i = begin; i < end; i++)
+              for (size_t j = i_begin; j < i_end; j++)
                 matrix[i][j] = MIN(matrix[i][j], matrix[i][k] + matrix[k][j]);
+        }
+
+        // j-aligned slightly dependent blocks
+#pragma omp parallel for schedule(static)
+        for (size_t j_block = 0; j_block < block_end; j_block++) {
+          const size_t j_begin = j_block * BLOCK_SIZE;
+          const size_t j_end = (j_block + 1) * BLOCK_SIZE > node_count ? node_count : (j_block + 1) * BLOCK_SIZE;
+          for (size_t k = begin; k < end; k++)
+            for (size_t i = j_begin; i < j_end; i++)
+              for (size_t j = begin; j < end; j++)
+                matrix[i][j] = MIN(matrix[i][j], matrix[i][k] + matrix[k][j]);
+        }
+
+        // doubly dependent blocks
+#pragma omp parallel for collapse(2) schedule(static)
+        for (size_t i_block = 0; i_block < block_end; i_block++) {
+          for (size_t j_block = 0; j_block < block_end; j_block++) {
+            const size_t i_begin = i_block * BLOCK_SIZE;
+            const size_t i_end = (i_block + 1) * BLOCK_SIZE > node_count ? node_count : (i_block + 1) * BLOCK_SIZE;
+            const size_t j_begin = j_block * BLOCK_SIZE;
+            const size_t j_end = (j_block + 1) * BLOCK_SIZE > node_count ? node_count : (j_block + 1) * BLOCK_SIZE;
+            for (size_t i = j_begin; i < j_end; i++)
+              for (size_t j = i_begin; j < i_end; j++)
+                for (size_t k = begin; k < end; k++)
+                  matrix[i][j] = MIN(matrix[i][j], matrix[i][k] + matrix[k][j]);
+          }
         }
       }
     }
