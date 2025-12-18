@@ -5,7 +5,7 @@
 ### Floyd-Warshall
 
 Floyd–Warshallův algoritmus je algoritmus dynamického programování pro nalezení nejkratších cest mezi všemi páry vrcholů v grafu (v tomto případě orientovaném). 
-Pracuje s maticí vzdáleností, kde neexistující hrana je reprezentována jako $+\infty$ a na diagonále jsou nuly. 
+Pracuje s maticí vzdáleností $D$, kde neexistující hrana je reprezentována jako $+\infty$ a na diagonále jsou nuly. 
 Algoritmus postupně „povoluje“ meziuzly $k = 0..n−1$ a pro každou trojici vrcholů $(i, j, k)$ aktualizuje vzdálenost podle pravidla: $D[i][j] = min(D[i][j], D[i][k] + D[k][j])$. 
 Po dokončení obsahuje matice $D$ nejkratší vzdálenosti mezi všemi páry vrcholů. 
 Časová složitost je $O(n^3)$, paměťová náročnost $O(n^2)$.
@@ -17,7 +17,7 @@ Dijkstrův algoritmus hledá nejkratší cesty z jednoho zdroje do všech ostatn
 Používá greedy přístup s prioritní frontou.
 Inicializuje pole $dist[]$, kde $dist[source]=0$ a ostatní = $\infty$.
 Opakovaně vybírá nezpracovaný vrchol $u$ s nejmenší $dist[u]$, označí ho za zpracovaný a pro každého souseda $v$ provede relaxaci:
-pokud $dist[v] > dist[u] + w(u,v)$, nastaví $dist[v] = dist[u] + w(u,v)$ (a vloží/aktualizuje $v$ v haldě).
+pokud $dist[v] > dist[u] + w(u,v)$ ($w(u,v)$ je váha hrany $(u,v)$), nastaví $dist[v] = dist[u] + w(u,v)$ (a vloží/aktualizuje $v$ v haldě).
 Po vyprázdnění haldy obsahuje $dist[]$ nejkratší vzdálenosti od zdroje.
 Časová složitost je $O((V + E) log V)$ s binární haldou a seznamem sousedů (nebo $O(V^2)$ při matici sousednosti).
 Pro porovnání s Floyd-Warshallovým algoritmem, je třeba volat Dijkstrův algortimus z každého vrcholu.
