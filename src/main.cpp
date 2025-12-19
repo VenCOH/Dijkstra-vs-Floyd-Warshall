@@ -90,11 +90,19 @@ int main() {
 #endif
 
   DistanceMatrix paths_fw_omp(NODE_COUNT);
-  run_solver_timed("Blocked Floyd-Warshall", BlockedFloydWarshallPathFinder(), matrix,
+  run_solver_timed("Blocked Floyd-Warshall OMP", BlockedFloydWarshallPathFinderOMP(), matrix,
                    paths_fw_omp);
   if (NODE_COUNT <= 20)
     paths_fw_omp.print();
   std::cout << "Is same as Floyd-Warshall? " << (paths_fw == paths_fw_omp) <<
+      std::endl;
+
+  DistanceMatrix paths_fw_blck(NODE_COUNT);
+  run_solver_timed("Blocked Floyd-Warshall", BlockedFloydWarshallPathFinder(), matrix,
+                   paths_fw_blck);
+  if (NODE_COUNT <= 20)
+    paths_fw_blck.print();
+  std::cout << "Is same as Floyd-Warshall? " << (paths_fw == paths_fw_blck) <<
       std::endl;
 
 #ifdef DIJKSTRA
